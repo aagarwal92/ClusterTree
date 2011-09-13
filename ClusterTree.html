@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Reddit Data Visualization - Cluster Tree</title>
+    <script src="REDDITS.json"></script>
+    <script type="text/javascript" src="d3.js"></script>
+    <script type="text/javascript" src="d3.layout.js"></script>
+    	<script type="text/javascript" src="jquery.js"></script>
+        <script type="text/javascript" src="jquery.autocomplete.js"></script>
+
+    
+
+<style type="text/css">
+
+ body {background-color: #F7F4EE;}
+
+
+circle.node {
+  cursor: pointer;
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5;
+}
+
+circle.node2 {
+  cursor: pointer;
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 5.5px;
+}
+
+circle.node3 {
+  cursor: pointer;
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 10.5px;
+}
+
+path.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+
+#test img {
+	border:0;
+	cursor:pointer;
+	margin:0 8px;
+        margin-top:100px;
+}
+
+#tt {
+ position:absolute;
+ display:block;
+ background:url(images/tt_left.gif) top left no-repeat;
+ }
+
+ #tttop {
+ display:block;
+ height:5px;
+ margin-left:5px;
+ background:url(images/tt_top.gif) top right no-repeat;
+ overflow:hidden;
+ 
+ 
+ }
+ #ttcont {
+ display:block;
+ padding:2px 12px 3px 7px;
+ margin-left:5px;
+ background:#666;
+  border-radius: 10px;	
+ color:#fff;
+ }
+#ttbot {
+display:block;
+height:5px;
+margin-left:5px;
+background:url(images/tt_bottom.gif) top right no-repeat;
+overflow:hidden;
+}
+
+.wireframemenu{
+border: 1px solid #C0C0C0;
+border-radius: 10px;	
+background-color: white;
+width: 170px;
+position: absolute;
+}
+
+* html .wireframemenu{ /*IE only rule. Original menu width minus all left/right paddings */
+width: 164px;
+}
+
+.wireframemenu ul{
+padding: 0;
+margin: 0;
+list-style-type: none;
+}
+
+.wireframemenu a{
+font: bold 13px Verdana;
+padding: 4px 3px;
+width: 100%; /*Define width for IE6's sake*/
+color: #595959;
+text-decoration: none;
+background-color: #;
+}
+
+.wireframemenu a:visited{
+color: #595959;
+}
+
+html>body .wireframemenu a{ /*Non IE rule*/
+width: auto;
+}
+
+.wireframemenu a:hover{
+background-color: #F7F4EE;
+color: #000000;
+cursor: pointer;
+}
+
+.clear { /* generic container (i.e. div) for floating buttons */
+    overflow: hidden;
+    width: 100%;
+}
+
+#subredditinfo a:first
+{
+  background-color: #ffff00; 
+}
+
+#staticmenu
+{
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 5px;
+}
+
+#staticmenu2
+{
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 5px;
+}
+    </style>
+        <link type="text/css" rel="stylesheet" href="button.css"/>
+	        <link type="text/css" rel="stylesheet" href="jquery.autocomplete.css"/>
+  </head>
+ <body>
+            <button type="button" onclick="window.location.reload()">Reset</button>
+        <button type="button" onclick="back2()">Move up the Tree</button>
+	</br>
+
+<form action="" onsubmit="return false;">
+	<p>
+		<input type="text" id="CityLocal" value="" />
+		<input type="button" value="Go" onclick="lookupLocal();" />
+		(Shows a max of 10 entries)
+	</p>
+</form>	  
+
+    <div id="chart"></div>
+    <script type="text/javascript" language="javascript" src="Tooltip.js"></script>
+    <script type="text/javascript" src="ClusterTree.js"></script>
+    <script type="text/javascript" src="StaticMenu.js"></script>
+
+
+<div id="staticmenu" class="wireframemenu" style="right: 300px; top: 20px; width: 300px; font-size: 14pt;">
+<center> <h2><div id="redditname"></div></h2></center>
+<center> <div id="subscribers" style="font-size: 13pt">
+  <br>
+  </br>
+</div></center>
+
+<div id="redditlink" style="font-size: 13pt"></div>
+
+<center><div id="redditinfo">
+<h2>Reddit</h2>
+<ul>
+  <li>Total Subscribers: 2000000</li>
+</ul>
+</br>
+ <a href= "http://www.reddit.com"> Click here </a> to view the actual reddit page.
+</div></center>
+<div id="readme">
+
+--------------------------------------------------
+<h2>Instructions</h2>
+1. Click on any of the following sub-reddits to view its parents and subscriber info.
+However, you may not click on any Reddit's with no children as they will have no parent tree.</br> </br>
+2. You may also mouseover any of the nodes on this visualization to view further information on the sureddit. </br> </br>
+3. Once a reddit has been clicked on, you may use the 'Move up the Tree' feature to view that reddit's
+   parent tree and more.</br> </br>
+4. If you would like to visit that reddit's page itself, please click on that specfic reddit's link that is listed right above.
+
+</div>
+</div>
+<div id="staticmenu2" class="wireframemenu" style="right: 115px; top: 20px">
+<center><div id="subredditinfo" style="font-size: 14pt"></div></center>
+</div>
+  </body>
+</html>
