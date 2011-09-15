@@ -5,8 +5,8 @@ var diagonal = null;
 var curNode = null;
 var curNodeParent = null;
 var count = 0;
+var counter = 0;
 var numRents = 0;
-var tempRent3 = null;
 var array_test = new Array();
 var tempList = null;
 var w =0,
@@ -36,11 +36,11 @@ d3.json("REDDITS3.json", function(json) {
  
 });
 
+/* draws out the visualization based on inputs provided by the json data above */
 function update(source) {
   
     var nodes = cluster.nodes(source).reverse();
-  
-  
+
      var node = vis.selectAll("g.node")
          .data(nodes)
        .enter().append("svg:g")
@@ -129,6 +129,7 @@ function update(source) {
  
  (source);
 
+/* what to display through the DOM on the start page */
     if (source.name == "Reddit")
     {
     document.getElementById("subredditinfo").style.display = "none";
@@ -143,13 +144,13 @@ function update(source) {
     }
 }
 
-function resetNames ()
+/* called when node is clicked on to reset diagram and the names */
+function resetNames()
 {
   var nodes = cluster.nodes(jsonData).reverse();
     var node = vis.selectAll("g.node")
        .data(nodes)
        .remove(); 
-  
   
   for (i = 0; i< nodes.length ;i++)
   {
@@ -162,6 +163,7 @@ function resetNames ()
   }
 }
 
+/* Gets the height of a function based on the nodes */
 function getHeight(x)
 {
   w = 960;
@@ -175,17 +177,15 @@ function getHeight(x)
   window.scrollTo( 0,0) ;
 }
 
-var temp = null;
-
+/* Controls what happens when a node is clicked on, with d being the reference to the node */
 function click (d)
 {
-  
   if (d == undefined)
   {
     return;
   }
   
-  var subsInfo = "";
+  var subsInfo = "";  
   subsInfo =  "Subscribers: ";
   d.size;
   subsInfo = subsInfo.bold();
@@ -193,7 +193,8 @@ function click (d)
   var redName = d.name;
   
   var link = "</br>" +"<a href = http://www.reddit.com/r/" + d.name + "> Click here </a>" + "to view the actual sub-reddit page";;
-  
+ 
+ // changes static menu only if the sub-reddit has no children
   if (d.children == null)
   {
     document.getElementById("redditinfo").style.display = "none";
@@ -213,26 +214,30 @@ function click (d)
     return;
   }
   
+  //resets the names after
   if (d.name != "Reddit")
   {
     resetNames();
   }
   
+  // if the current node is reddit, then reset
   if (d.parent == undefined)
     reset();
   else
     console.log(d.parent.parent);
+    
+  // sets global variable to the current node
   curNode = d;
   curNodeParent = d.parent;
+
+ // resets the visualization once a node is clicked upon 
   root = d;
-  temp = root.parent;
   getHeight(d);
   update(root);
     
-  showRentList2();
-  console.log(d.name);
-  count == 0;
+  showParentListClick();
   
+  // Changes the DOM elements for the static menu based on if the node is Reddit or not.
   if(d.name == "Reddit"){
     document.getElementById("subredditinfo").style.display = "none";
     document.getElementById("staticmenu2").style.display = "none";
@@ -242,7 +247,6 @@ function click (d)
 
     var redLink = document.getElementById('redditlink');
     redLink.innerHTML = link2;
-    //document.getElementById("subscribers").style.display = "block";
 
   }
   else
@@ -252,25 +256,32 @@ function click (d)
     document.getElementById("redditname").style.display = "block";
     document.getElementById("subscribers").style.display = "block";
     document.getElementById("redditlink").style.display = "block";
-    showRentList4();
+    
+    showParentListBackButton();
     var rentList2 = document.getElementById('subredditinfo');
-    rentList2.innerHTML = showRentList4() + "</br>" + " ↓ " + "</br>" + d.name.bold();
+    rentList2.innerHTML = showParentListBackButton() + "</br>" + " ↓ " + "</br>" + d.name.bold();
+    
     var subs = document.getElementById('subscribers');
     subs.innerHTML = subsInfo + d.size;
+    
     var name = document.getElementById('redditname');
     name.innerHTML = redName;
+    
     var redLink = document.getElementById('redditlink');
     redLink.innerHTML = link;
-    //rentList2.innerHTML = "Parent1<br/>Parent2<br/>Parent3";
+
   }
 }
 
-function back2()
+/* Controls the change in the visualiztion when the Move up Tree button is called */
+function moveUpTreeButton()
 {
   if (curNode==null)
   {
     return;
   }
+  
+  // reset the whole page if the node is Reddit
   if (curNodeParent.name == "Reddit")
   {
     reset();
@@ -279,20 +290,14 @@ function back2()
     getHeight(curNodeParent);
     update(curNodeParent);
     
-  if (curNodeParent.name == "Reddit")
+  if (curNodeParent.name != "Reddit")
   {
-
-  }
-  else
-  { 
-    
-        
     if (curNodeParent.parent != null)
     {
       curNodeParent = curNodeParent.parent;
     }
 
-    //showRentList2();
+    // controls the DOM elements based what reddit is the set to the current node
     document.getElementById("subredditinfo").style.display = "block";
     document.getElementById("subscribers").style.display = "block";
     document.getElementById("redditinfo").style.display = "none";
@@ -301,24 +306,28 @@ function back2()
 
     var subs = document.getElementById('subscribers');
     subs.innerHTML = showSubs();
+    
     var rentList2 = document.getElementById('subredditinfo');
-    rentList2.innerHTML = showRentList2();
+    rentList2.innerHTML = showParentListClick();
+    
     var name = document.getElementById('redditname');
     name.innerHTML = showName();
+    
     var redLink = document.getElementById('redditlink');
     redLink.innerHTML = showLink();
 
+  // sets count for the amount of times tree has moved up.
   count ++;
-  console.log(count);
-  
   }
 }
 
-function moveUp(nodeName)
+/* Controls what happend when a parent is clicked on within the Parent List on the right static menu */
+function moveUpWithinParentList(nodeName)
 {
     var nodes = cluster.nodes(jsonData).reverse();
     nodes.forEach(function(d)
     {
+      //resets the visualization to that node
       if (d.name == nodeName)
       {
         click(d);
@@ -326,22 +335,6 @@ function moveUp(nodeName)
     })    
 }
 
-/*
-
-function search(search_form)
-{
-    var nodes = cluster.nodes(jsonData).reverse();
-    nodes.forEach(function (d)
-                  {
-                   d.name.toLowerCase();
-                   if (d.name.toLowerCase() == text)
-                   {
-                    "goes in"
-                    click(d)
-                   }
-                  });
-}
-*/
 function showLink()
 {
     var curNode2 = curNode;  
@@ -377,26 +370,37 @@ function showSubs()
     return subsInfo2 + curNode2.parent.size;
 }
 
-function showRentList2()
+/* Controls what is shown on the parent list on the right static menu when a node is clicked. */
+function showParentListClick()
   {
-    //var tempRent3;
+    // counter to see if the function is called after the move up button has been clicked.
+    counter = counter + 1;
+
+    var rentList;
   
     var curNode2 = curNode;
+    
+    // sets the current node and its parent based on what the count is from the back button
     for (i = 0; i < count; i++)
     {
-      curNode2 = curNode2.parent;
+      if (curNode2.parent != undefined)
+        curNode2 = curNode2.parent;
+      else
+        curNode2 = curNode2;
     }
-     tempRent3 = curNode2;       
+    
+      // while it is not undefined, build the parent list
+      if (curNode2.parent != undefined)
       {
       for (x = 0; x < 20; x++)
       {
         if (x == 0)
         {
-          rentList = tempRent3.parent.name.bold();
-          if (tempRent3.parent != undefined)
+          rentList = curNode2.parent.name.bold();
+          if (curNode2.parent != undefined)
         {
-          tempRent3 = tempRent3.parent;
-          if (tempRent3.name == "Reddit")
+          curNode2 = curNode2.parent;
+          if (curNode2.name == "Reddit")
           {
             return rentList;
           }
@@ -405,65 +409,70 @@ function showRentList2()
         }
         else
         {
-        tempList = tempRent3.parent + tempList ;
-        rentList = "<a onclick='moveUp(\"" + tempRent3.parent.name + "\")'>" + tempRent3.parent.name +  "</a>"+ "</br>" +  " ↓ " + "</br>" + rentList;// +  tempRent3.parent.name; //+ "</br>" +  " ↓ " + "</br>" + curNode2.parent.name ;
-        if (tempRent3.parent != undefined)
+          
+        // builds the parent list with anchor elements
+        tempList = curNode2.parent + tempList ;
+        rentList = "<a onclick='moveUpWithinParentList(\"" + curNode2.parent.name + "\")'>" + curNode2.parent.name +  "</a>"+ "</br>" +  " ↓ " + "</br>" + rentList;
+        if (curNode2.parent != undefined)
         {
-          tempRent3 = tempRent3.parent;
-          if (tempRent3.name == "Reddit")
+          curNode2 = curNode2.parent;
+          
+          // once it reaches reddit, the list is finished and the function returns the list.
+          if (curNode2.name == "Reddit")
           {
             return rentList;
           }
           numRents++;
         }
         }
+        
       }
       }
       return rentList;
   }
   
-  function showRentList4()
+  /* controls the parent list changing when the back button is clicked on */
+  function showParentListBackButton()
   {
-    //var rentList = ""
+    var rentList;
+
+    if (counter > 0)
+    {
+      count = 0;
+    }
+
     var curNode2 = curNode;
     for (i = 0; i < count; i++)
     {
       curNode2 = curNode2.parent;
     }
      var tempRent = curNode2; 
-
-   /*   if (tempRent.name == "Reddit")
-      {
-        rentList = tempRent.name + "</br>" +  " ↓ " + "</br>" +  curNode.name;
-        return rentList;
-      }*/
       
       for (x = 0; x < 20; x++)
       {
         if (x == 0)
         {
-          rentList = "<a onclick='moveUp(\"" + tempRent.parent.name + "\")'>" + tempRent.parent.name + "</a>";
-          if (tempRent.parent != undefined)
+          // if there is only one parent, it will build the list with that parent and return it.
+          rentList = "<a onclick='moveUpWithinParentList(\"" + curNode2.parent.name + "\")'>" + curNode2.parent.name + "</a>";
+          if (curNode2.parent != undefined)
         {
-          tempRent = tempRent.parent;
-          if (tempRent.name == "Reddit")
+          curNode2 = curNode2.parent;
+          if (curNode2.name == "Reddit")
           {
-           // rentList = tempRent.name + "</br>" +  " ↓ " + "</br>" + rentList;
-      //     var rentList2 = rentList.substring(0, rentList.length-2);
             return rentList;
           }
         }
         }
         else
         {
-          
-    
-       // rentList = "<a onclick='moveUp(\"" + tempRent.parent.name + "</br>" +  " ↓ " + "</br>" + rentList;// +  tempRent.parent.name; //+ "</br>" +  " ↓ " + "</br>" + curNode2.parent.name ;
-        rentList = "<a onclick='moveUp(\"" + tempRent.parent.name + "\")'>" + tempRent.parent.name +  "</a>"+ "</br>" +  " ↓ " + "</br>" + rentList;
-        if (tempRent.parent != undefined)
+        //builds the list with anchor elements 
+        rentList = "<a onclick='moveUpWithinParentList(\"" + curNode2.parent.name + "\")'>" + curNode2.parent.name +  "</a>"+ "</br>" +  " ↓ " + "</br>" + rentList;
+        if (curNode2.parent != undefined)
         {
-          tempRent = tempRent.parent;
-          if (tempRent.name == "Reddit")
+          curNode2 = curNode2.parent;
+          
+          // once it reaches reddit, the list is finished and the function returns the list.
+          if (curNode2.name == "Reddit")
           {
             return rentList;
           }
@@ -473,7 +482,7 @@ function showRentList2()
       return rentList;
   }
 
-
+/* what happens if a node is moused on upon */
 function mouseon(d)
 {
   function kids()
@@ -503,7 +512,8 @@ function mouseon(d)
     var rentList = ""
     var tempRent = d.parent;
 
-   function parentals()
+/* controls what is shown on the tooltip*/
+   function tooltipShow()
    {
       if (tempRent.name == "Reddit")
       {
@@ -529,25 +539,13 @@ function mouseon(d)
   
   tooltip.show('<strong> Sub-Reddit Name: </strong>' + d.name +
                '<br /><strong> Subscriber Count: </strong>' + d.size +
-               '<br /><strong> Parent List: </stong>' + parentals() + 
+               '<br /><strong> Parent List: </stong>' + tooltipShow() + 
                '<br /><strong> Children: </strong>' + kids());
 }
-
-function test()
-{
-  console.log("test");
-  console.log(rentList)
-} 
 
 function mouseoff(d)
 {
   tooltip.hide();
-}
-
-function nodeSize()
-{ 
-  var size = 150;
-  return size;
 }
 
 function reset()
@@ -556,7 +554,9 @@ function reset()
   count == 0;
 }
 
-function fillArray()
+
+/* Code that controls the autocomplete function*/
+function fillAutoCompleteArray()
 {
     var nodes = cluster.nodes(jsonData).reverse();
     var nodes2 = new Array();
@@ -569,12 +569,8 @@ function fillArray()
     return nodes2;
 }
 
-function test22()
-{
-  console.log("fdadf");
-}
 
-function findValue(li) {
+function findAutoCompleteValue(li) {
   
   if( li == null ) return;
   if( !!li.extra ) var sValue = li.extra[0];
@@ -588,36 +584,17 @@ function findValue(li) {
       {
     if (d.children != null)
      {
-       "goes in222"
        click(d);
       }
      }
     });
 }
-	
-        /*
-        if( li == null ) return alert("No match!");
-
-
-
-	// if coming from an AJAX call, let's use the CityId as the value
-
-	if( !!li.extra ) var sValue = li.extra[0];
-
-	// otherwise, let's just display the value in the text box
-	else var sValue = li.selectValue;
-
-	alert("The value you selected was: " + sValue);
-        */
-
-
 
 function selectItem(li) {
 
-	findValue(li);
+	findAutoCompleteValue(li);
 
 }
-
 
 
 function formatItem(row) {
@@ -626,57 +603,19 @@ function formatItem(row) {
 
 }
 
-function lookupAjax(){
-
-	var oSuggest = $("#CityAjax")[0].autocompleter;
-	oSuggest.findValue();
-	return false;
-}
-
-
-
 function lookupLocal(){
 
-	var oSuggest = $("#CityLocal")[0].autocompleter;
-	oSuggest.findValue();
+	var oSuggest = $("#search")[0].autocompleter;
+	oSuggest.findAutoCompleteValue();
 	return false;
 }
 
 
 $(document).ready(function() {
 
-	$("#CityAjax").autocomplete(
+	$("#search").autocompleteArray(
 
-		"autocomplete_ajax.cfm",
-
-		{
-
-			delay:10,
-
-			minChars:2,
-
-			matchSubset:1,
-
-			matchContains:1,
-
-			cacheLength:10,
-
-			onItemSelect:findValue,
-
-			onFindValue:findValue,
-
-			formatItem:formatItem,
-
-			autoFill:true
-
-		}
-
-	);
-        
-
-	$("#CityLocal").autocompleteArray(
-
-		fillArray(),
+		fillAutoCompleteArray(),
 		{
 			delay:10,
 
@@ -684,9 +623,9 @@ $(document).ready(function() {
 
 			matchSubset:1,
 
-			onItemSelect:findValue,
+			onItemSelect:findAutoCompleteValue,
 
-			onFindValue: findValue,
+			onFindValue: findAutoCompleteValue,
 
 			autoFill:true,
 
@@ -697,4 +636,3 @@ $(document).ready(function() {
 	);
 
 });
-

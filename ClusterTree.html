@@ -15,26 +15,12 @@
 
  body {background-color: #F7F4EE;}
 
-
+/* node size css */
 circle.node {
   cursor: pointer;
   fill: #fff;
   stroke: steelblue;
   stroke-width: 1.5;
-}
-
-circle.node2 {
-  cursor: pointer;
-  fill: #fff;
-  stroke: steelblue;
-  stroke-width: 5.5px;
-}
-
-circle.node3 {
-  cursor: pointer;
-  fill: #fff;
-  stroke: steelblue;
-  stroke-width: 10.5px;
 }
 
 path.link {
@@ -50,6 +36,7 @@ path.link {
 	margin:0 8px;
         margin-top:100px;
 }
+/* tooltip css */
 
 #tt {
  position:absolute;
@@ -82,6 +69,7 @@ background:url(images/tt_bottom.gif) top right no-repeat;
 overflow:hidden;
 }
 
+/* static menu css */
 .wireframemenu{
 border: 1px solid #C0C0C0;
 border-radius: 10px;	
@@ -152,12 +140,12 @@ cursor: pointer;
   </head>
  <body>
             <button type="button" onclick="window.location.reload()">Reset</button>
-        <button type="button" onclick="back2()">Move up the Tree</button>
+        <button type="button" onclick="moveUpTreeButton()">Move up the Tree</button>
 	</br>
 
 <form action="" onsubmit="return false;">
 	<p>
-		<input type="text" id="CityLocal" value="" />
+		<input type="text" id="search" value="" />
 		<input type="button" value="Go" onclick="lookupLocal();" />
 		(Shows a max of 10 entries)
 	</p>
@@ -186,6 +174,7 @@ cursor: pointer;
 </br>
  <a href= "http://www.reddit.com"> Click here </a> to view the actual reddit page.
 </div></center>
+
 <div id="readme">
 
 --------------------------------------------------

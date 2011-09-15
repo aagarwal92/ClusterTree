@@ -380,44 +380,47 @@ jQuery.autocomplete = function(input, options) {
 		options.extraParams = p;
 	};
 
-	this.findValue = function(){
+	this.findAutoCompleteValue = function(){
 		var q = $input.val();
 
 		if (!options.matchCase) q = q.toLowerCase();
 		var nodes = cluster.nodes(jsonData).reverse();
 		nodes.forEach(function (d)
                   {
+		   if (d.name.toLowerCase() == q)
+		   {
                    d.name.toLowerCase();
 		   if (d.children != null)
 		   {
-                   if (d.name.toLowerCase() == q)
-                   {
-                    "goes in"
-                    click(d);
-                   }
+			if (d.name.toLowerCase() == q)
+			   {
+			    "goes in"
+			    click(d);
+			   }
 		   }
-		   else if (d.children == null)
+		   if (d.children == undefined)
 		   {
 			click(d);
+		   }
 		   }
                   });
 		
 		var data = options.cacheLength ? loadFromCache(q) : null;
 		if (data) {
-			findValueCallback(q, data);
+			findAutoCompleteValueCallback(q, data);
 		} else if( (typeof options.url == "string") && (options.url.length > 0) ){
 			$.get(makeUrl(q), function(data) {
 				data = parseData(data)
 				addToCache(q, data);
-				findValueCallback(q, data);
+				findAutoCompleteValueCallback(q, data);
 			});
 		} else {
 			// no matches
-			findValueCallback(q, null);
+			findAutoCompleteValueCallback(q, null);
 		}
 	}
 
-	function findValueCallback(q, data){
+	function findAutoCompleteValueCallback(q, data){
 		if (data) $input.removeClass(options.loadingClass);
 
 		var num = (data) ? data.length : 0;
