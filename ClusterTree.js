@@ -6,7 +6,6 @@ var curNode = null;
 var curNodeParent = null;
 var count = 0;
 var counter = 0;
-var numRents = 0;
 var array_test = new Array();
 var tempList = null;
 var w =0,
@@ -20,7 +19,7 @@ d3.json("REDDITS3.json", function(json) {
 
  jsonData = json;
 
-  getHeight(jsonData);
+  resetSize(jsonData);
 
  diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
@@ -31,14 +30,14 @@ d3.json("REDDITS3.json", function(json) {
   .append("svg:g")
     .attr("transform", "translate(100,0)");
 
-
- update(root = jsonData);
+ update(jsonData);
  
 });
 
 /* draws out the visualization based on inputs provided by the json data above */
 function update(source) {
   
+    var i = 0 ;
     var nodes = cluster.nodes(source).reverse();
 
      var node = vis.selectAll("g.node")
@@ -127,8 +126,6 @@ function update(source) {
     d.y0 = d.y;
   });
  
- (source);
-
 /* what to display through the DOM on the start page */
     if (source.name == "Reddit")
     {
@@ -140,7 +137,6 @@ function update(source) {
     else
     {
     document.getElementById("staticmenu2").style.display = "block";
-
     }
 }
 
@@ -151,7 +147,7 @@ function resetNames()
     var node = vis.selectAll("g.node")
        .data(nodes)
        .remove(); 
-  
+  /*
   for (i = 0; i< nodes.length ;i++)
   {
     nodes[i] = "";
@@ -160,14 +156,13 @@ function resetNames()
   {
     return true;
    console.log("true");
-  }
+  }*/
 }
 
-/* Gets the height of a function based on the nodes */
-function getHeight(x)
+/* Resets the size of the viz based on the nodes */
+function resetSize(x)
 {
   w = 960;
-  i = 0;
   duration = 500;
   
     h = (x.children.length*40);
@@ -184,92 +179,41 @@ function click (d)
   {
     return;
   }
-  
-  var subsInfo = "";  
-  subsInfo =  "Subscribers: ";
-  d.size;
-  subsInfo = subsInfo.bold();
-  
-  var redName = d.name;
-  
-  var link = "</br>" +"<a href = http://www.reddit.com/r/" + d.name + "> Click here </a>" + "to view the actual sub-reddit page";;
- 
+
  // changes static menu only if the sub-reddit has no children
   if (d.children == null)
   {
-    document.getElementById("redditinfo").style.display = "none";
-    document.getElementById("redditname").style.display = "block";
-    document.getElementById("subscribers").style.display = "block";
-    document.getElementById("redditlink").style.display = "block";
-  
-    var subs = document.getElementById('subscribers');
-    subs.innerHTML = subsInfo + d.size;
-
-    var name = document.getElementById('redditname');
-    name.innerHTML = d.name;
-
-    var redLink = document.getElementById('redditlink');
-    redLink.innerHTML = link;
-    
+    setDisplayNoChildren(d);    
     return;
   }
   
-  //resets the names after
+  //resets the names if the node is not reddit.
   if (d.name != "Reddit")
   {
     resetNames();
   }
-  
-  // if the current node is reddit, then reset
-  if (d.parent == undefined)
-    reset();
   else
-    console.log(d.parent.parent);
-    
+  {
+    // if the current node is reddit, then reset
+    reset();
+  }
+ 
   // sets global variable to the current node
   curNode = d;
   curNodeParent = d.parent;
 
  // resets the visualization once a node is clicked upon 
-  root = d;
-  getHeight(d);
-  update(root);
-    
-  showParentListClick();
-  
+  resetSize(d);
+  update(d);
+      
   // Changes the DOM elements for the static menu based on if the node is Reddit or not.
-  if(d.name == "Reddit"){
-    document.getElementById("subredditinfo").style.display = "none";
-    document.getElementById("staticmenu2").style.display = "none";
-    document.getElementById("subscribers").style.display = "none";
-    document.getElementById("redditlink").style.display = "none";
-    document.getElementById("redditinfo").style.display = "block";
-
-    var redLink = document.getElementById('redditlink');
-    redLink.innerHTML = link2;
-
+  if(d.name == "Reddit")
+  {
+    setDisplayReddit(d);
   }
   else
   {
-    document.getElementById("redditinfo").style.display = "none";
-    document.getElementById("subredditinfo").style.display = "block";
-    document.getElementById("redditname").style.display = "block";
-    document.getElementById("subscribers").style.display = "block";
-    document.getElementById("redditlink").style.display = "block";
-    
-    showParentListBackButton();
-    var rentList2 = document.getElementById('subredditinfo');
-    rentList2.innerHTML = showParentListBackButton() + "</br>" + " ↓ " + "</br>" + d.name.bold();
-    
-    var subs = document.getElementById('subscribers');
-    subs.innerHTML = subsInfo + d.size;
-    
-    var name = document.getElementById('redditname');
-    name.innerHTML = redName;
-    
-    var redLink = document.getElementById('redditlink');
-    redLink.innerHTML = link;
-
+    setDisplaySubReddits(d);
   }
 }
 
@@ -280,14 +224,13 @@ function moveUpTreeButton()
   {
     return;
   }
-  
   // reset the whole page if the node is Reddit
   if (curNodeParent.name == "Reddit")
   {
     reset();
   }
     resetNames();
-    getHeight(curNodeParent);
+    resetSize(curNodeParent);
     update(curNodeParent);
     
   if (curNodeParent.name != "Reddit")
@@ -298,23 +241,7 @@ function moveUpTreeButton()
     }
 
     // controls the DOM elements based what reddit is the set to the current node
-    document.getElementById("subredditinfo").style.display = "block";
-    document.getElementById("subscribers").style.display = "block";
-    document.getElementById("redditinfo").style.display = "none";
-    document.getElementById("redditname").style.display = "block";
-    document.getElementById("redditlink").style.display = "block";
-
-    var subs = document.getElementById('subscribers');
-    subs.innerHTML = showSubs();
-    
-    var rentList2 = document.getElementById('subredditinfo');
-    rentList2.innerHTML = showParentListClick();
-    
-    var name = document.getElementById('redditname');
-    name.innerHTML = showName();
-    
-    var redLink = document.getElementById('redditlink');
-    redLink.innerHTML = showLink();
+    backButtonSubReddits();
 
   // sets count for the amount of times tree has moved up.
   count ++;
@@ -333,6 +260,272 @@ function moveUpWithinParentList(nodeName)
         click(d);
       }
     })    
+}
+
+/* Controls what is shown on the parent list on the right static menu when a node is clicked. */
+function showParentListBackButton()
+  {
+    // counter to see if the function is called after the move up button has been clicked.
+    counter = counter + 1;
+
+    var rentList;
+    var curNode2 = curNode;
+    
+    // sets the current node and its parent based on what the count is from the back button
+    for (i = 0; i < count; i++)
+    {
+      if (curNode2.parent != undefined)
+        curNode2 = curNode2.parent;
+      else
+        curNode2 = curNode2;
+    }
+      // while the current node is not undefined, build the parent list
+      if (curNode2.parent != undefined)
+      {
+        for (x = 0; x < 20; x++)
+        {
+          // adds the current node name bolded to the list
+          if (x == 0)
+          {
+            rentList = curNode2.parent.name.bold();
+            if (curNode2.parent != undefined)
+            {
+              curNode2 = curNode2.parent;
+              if (curNode2.name == "Reddit")
+              {
+                return rentList;
+              }
+            }
+          }
+          else
+          {    
+            // builds the parent list with anchor elements
+            tempList = curNode2.parent + tempList ;
+            rentList = "<a onclick='moveUpWithinParentList(\"" + curNode2.parent.name + "\")'>" + curNode2.parent.name +  "</a>"+ "</br>" +  " ↓ " + "</br>" + rentList;
+            if (curNode2.parent != undefined)
+            {
+              curNode2 = curNode2.parent; 
+              // once it reaches reddit, the list is finished and the function returns the list.
+              if (curNode2.name == "Reddit")
+              {
+                return rentList;
+              }
+            }
+          }
+        }
+      }
+      return rentList;
+  }
+  
+  /* controls the parent list changing when the back button is clicked on */
+  function showParentListClick()
+  {
+    var rentList;
+    
+    //controls the change when node is clicked on after a back button is called.
+    // if back buttonis called, counter is incremented, setting the count to 0, thus reseting the click memory. 
+    if (counter > 0)
+    {
+      count = 0;
+    }
+
+    var curNode2 = curNode;
+    for (i = 0; i < count; i++)
+    {
+      curNode2 = curNode2.parent;
+    }
+      
+      for (x = 0; x < 20; x++)
+      {
+        if (x == 0)
+        {
+          // if there is only one parent, it will build the list with that parent and return it.
+          rentList = "<a onclick='moveUpWithinParentList(\"" + curNode2.parent.name + "\")'>" + curNode2.parent.name + "</a>";
+          if (curNode2.parent != undefined)
+          {
+            curNode2 = curNode2.parent;
+            if (curNode2.name == "Reddit")
+            {
+              return rentList;
+            }
+          }
+        }
+        else
+        {
+          //builds the list with anchor elements 
+          rentList = "<a onclick='moveUpWithinParentList(\"" + curNode2.parent.name + "\")'>" + curNode2.parent.name +  "</a>"+ "</br>" +  " ↓ " + "</br>" + rentList;
+          if (curNode2.parent != undefined)
+          {
+            curNode2 = curNode2.parent;
+            // once it reaches reddit, the list is finished and the function returns the list.
+            if (curNode2.name == "Reddit")
+            {
+              return rentList;
+            }
+          }
+        }
+      }
+      return rentList;
+  }
+
+/* what happens if a node is moused on upon */
+function mouseon(d)
+{
+  function tooltipKids()
+  {
+    if (d.children == null)
+    {
+      return "None";
+    }
+
+    else if (d.children != null)
+    {
+      var childs = d.children;
+      var finalChilds = "";
+  
+      childs.forEach(function(child)
+      {
+        if (child.name != undefined)
+        {
+        finalChilds = finalChilds + "{" + child.name + "}  ";
+        }
+      });
+  
+      return finalChilds;
+    }    
+  }
+
+    var rentList = ""
+    var tempRent = d.parent;
+
+/* controls what is shown on the tooltip*/
+   function tooltipShow()
+   {
+      if (tempRent.name == "Reddit")
+      {
+        rentList = "{" + tempRent.name  + "}  ";
+        return rentList;
+      }
+      for (x = 0; x < 20; x++)
+      {
+        
+        rentList = rentList + "{" + tempRent.name + "}  ";
+        if (tempRent.parent != undefined)
+        {
+          tempRent = tempRent.parent;
+          if (tempRent.name == "Reddit")
+          {
+            rentList = rentList + "{" + tempRent.name + "}  ";
+            return rentList;
+          }
+        }
+      } 
+    return rentList;
+   }
+  
+  tooltip.show('<strong> Sub-Reddit Name: </strong>' + d.name +
+               '<br /><strong> Subscriber Count: </strong>' + d.size +
+               '<br /><strong> Parent List: </stong>' + tooltipShow() + 
+               '<br /><strong> Children: </strong>' + tooltipKids());
+}
+
+function mouseoff(d)
+{
+  tooltip.hide();
+}
+
+function reset()
+{
+  window.location.reload();
+  count == 0;
+}
+
+function hide(id)
+{
+  document.getElementById(id).style.display = "none";
+}
+
+function show(id)
+{
+  document.getElementById(id).style.display = "block";  
+}
+
+function setDisplayNoChildren(d)
+{
+    var subsInfo =  "Subscribers: ";
+    subsInfo = subsInfo.bold();
+  
+    var link = "</br> <a href = http://www.reddit.com/r/" + d.name + "> Click here </a>" + "to view the actual sub-reddit page"; 
+
+    hide("redditinfo");
+    show("redditname");
+    show("subscribers");
+    show("redditlink");
+
+    var subs = document.getElementById('subscribers');
+    subs.innerHTML = subsInfo + d.size;
+
+    var name = document.getElementById('redditname');
+    name.innerHTML = d.name;
+
+    var redLink = document.getElementById('redditlink');
+    redLink.innerHTML = link;
+}
+function setDisplayReddit(d)
+{  
+    show("redditinfo");
+    hide("subredditinfo");
+    hide("subscribers");
+    hide("redditlink");
+    hide("staticmenu2");
+}
+
+function setDisplaySubReddits(d)
+{
+    var subsInfo =  "Subscribers: ";
+    subsInfo = subsInfo.bold();
+  
+    var link = "</br> <a href = http://www.reddit.com/r/" + d.name + "> Click here </a>" + "to view the actual sub-reddit page"; 
+
+    hide("redditinfo");
+    show("subredditinfo");
+    show("redditname");
+    show("subscribers");
+    show("redditlink");
+    
+    showParentListClick();
+    var rentList2 = document.getElementById('subredditinfo');
+    rentList2.innerHTML = showParentListClick() + "</br>" + " ↓ " + "</br>" + d.name.bold();
+    
+    var subs = document.getElementById('subscribers');
+    subs.innerHTML = subsInfo + d.size;
+    
+    var name = document.getElementById('redditname');
+    name.innerHTML = d.name;
+    
+    var redLink = document.getElementById('redditlink');
+    redLink.innerHTML = link;
+}
+
+function backButtonSubReddits()
+{
+    hide("redditinfo");
+    show("subredditinfo");
+    show("redditname");
+    show("subscribers");
+    show("redditlink");
+
+    var subs = document.getElementById('subscribers');
+    subs.innerHTML = showSubs();
+    
+    var rentList2 = document.getElementById('subredditinfo');
+    rentList2.innerHTML = showParentListBackButton();
+    
+    var name = document.getElementById('redditname');
+    name.innerHTML = showName();
+    
+    var redLink = document.getElementById('redditlink');
+    redLink.innerHTML = showLink();
 }
 
 function showLink()
@@ -370,191 +563,6 @@ function showSubs()
     return subsInfo2 + curNode2.parent.size;
 }
 
-/* Controls what is shown on the parent list on the right static menu when a node is clicked. */
-function showParentListClick()
-  {
-    // counter to see if the function is called after the move up button has been clicked.
-    counter = counter + 1;
-
-    var rentList;
-  
-    var curNode2 = curNode;
-    
-    // sets the current node and its parent based on what the count is from the back button
-    for (i = 0; i < count; i++)
-    {
-      if (curNode2.parent != undefined)
-        curNode2 = curNode2.parent;
-      else
-        curNode2 = curNode2;
-    }
-    
-      // while it is not undefined, build the parent list
-      if (curNode2.parent != undefined)
-      {
-      for (x = 0; x < 20; x++)
-      {
-        if (x == 0)
-        {
-          rentList = curNode2.parent.name.bold();
-          if (curNode2.parent != undefined)
-        {
-          curNode2 = curNode2.parent;
-          if (curNode2.name == "Reddit")
-          {
-            return rentList;
-          }
-        }
-        numRents++;
-        }
-        else
-        {
-          
-        // builds the parent list with anchor elements
-        tempList = curNode2.parent + tempList ;
-        rentList = "<a onclick='moveUpWithinParentList(\"" + curNode2.parent.name + "\")'>" + curNode2.parent.name +  "</a>"+ "</br>" +  " ↓ " + "</br>" + rentList;
-        if (curNode2.parent != undefined)
-        {
-          curNode2 = curNode2.parent;
-          
-          // once it reaches reddit, the list is finished and the function returns the list.
-          if (curNode2.name == "Reddit")
-          {
-            return rentList;
-          }
-          numRents++;
-        }
-        }
-        
-      }
-      }
-      return rentList;
-  }
-  
-  /* controls the parent list changing when the back button is clicked on */
-  function showParentListBackButton()
-  {
-    var rentList;
-
-    if (counter > 0)
-    {
-      count = 0;
-    }
-
-    var curNode2 = curNode;
-    for (i = 0; i < count; i++)
-    {
-      curNode2 = curNode2.parent;
-    }
-     var tempRent = curNode2; 
-      
-      for (x = 0; x < 20; x++)
-      {
-        if (x == 0)
-        {
-          // if there is only one parent, it will build the list with that parent and return it.
-          rentList = "<a onclick='moveUpWithinParentList(\"" + curNode2.parent.name + "\")'>" + curNode2.parent.name + "</a>";
-          if (curNode2.parent != undefined)
-        {
-          curNode2 = curNode2.parent;
-          if (curNode2.name == "Reddit")
-          {
-            return rentList;
-          }
-        }
-        }
-        else
-        {
-        //builds the list with anchor elements 
-        rentList = "<a onclick='moveUpWithinParentList(\"" + curNode2.parent.name + "\")'>" + curNode2.parent.name +  "</a>"+ "</br>" +  " ↓ " + "</br>" + rentList;
-        if (curNode2.parent != undefined)
-        {
-          curNode2 = curNode2.parent;
-          
-          // once it reaches reddit, the list is finished and the function returns the list.
-          if (curNode2.name == "Reddit")
-          {
-            return rentList;
-          }
-        }
-        }
-      }
-      return rentList;
-  }
-
-/* what happens if a node is moused on upon */
-function mouseon(d)
-{
-  function kids()
-  {
-    if (d.children == null)
-    {
-      return "None";
-    }
-
-    if (d.children != null)
-    {
-    var childs = d.children;
-    var finalChilds = "";
-
-    childs.forEach(function(child)
-    {
-      if (child.name != undefined)
-      {
-      finalChilds = finalChilds + "{" + child.name + "}  ";
-      }
-    });
-
-    return finalChilds;
-    }    
-  }
-
-    var rentList = ""
-    var tempRent = d.parent;
-
-/* controls what is shown on the tooltip*/
-   function tooltipShow()
-   {
-      if (tempRent.name == "Reddit")
-      {
-        rentList = "{" + tempRent.name  + "}  ";
-        return rentList;
-      }
-      for (x = 0; x < 20; x++)
-      {
-        
-        rentList = rentList + "{" + tempRent.name + "}  ";
-        if (tempRent.parent != undefined)
-        {
-          tempRent = tempRent.parent;
-          if (tempRent.name == "Reddit")
-          {
-            rentList = rentList + "{" + tempRent.name + "}  ";
-            return rentList;
-          }
-        }
-      } 
-    return rentList;
-   }
-  
-  tooltip.show('<strong> Sub-Reddit Name: </strong>' + d.name +
-               '<br /><strong> Subscriber Count: </strong>' + d.size +
-               '<br /><strong> Parent List: </stong>' + tooltipShow() + 
-               '<br /><strong> Children: </strong>' + kids());
-}
-
-function mouseoff(d)
-{
-  tooltip.hide();
-}
-
-function reset()
-{
-  window.location.reload();
-  count == 0;
-}
-
-
 /* Code that controls the autocomplete function*/
 function fillAutoCompleteArray()
 {
@@ -568,7 +576,6 @@ function fillAutoCompleteArray()
     }
     return nodes2;
 }
-
 
 function findAutoCompleteValue(li) {
   
@@ -595,7 +602,6 @@ function selectItem(li) {
 	findAutoCompleteValue(li);
 
 }
-
 
 function formatItem(row) {
 
@@ -632,7 +638,5 @@ $(document).ready(function() {
 			maxItemsToShow:10
 
 		}
-
 	);
-
 });
