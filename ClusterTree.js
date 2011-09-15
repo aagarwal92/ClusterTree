@@ -6,7 +6,6 @@ var curNode = null;
 var curNodeParent = null;
 var count = 0;
 var counter = 0;
-var array_test = new Array();
 var tempList = null;
 var w =0,
     h = 0,
@@ -147,16 +146,6 @@ function resetNames()
     var node = vis.selectAll("g.node")
        .data(nodes)
        .remove(); 
-  /*
-  for (i = 0; i< nodes.length ;i++)
-  {
-    nodes[i] = "";
-  }
-  if (nodes[i]== "")
-  {
-    return true;
-   console.log("true");
-  }*/
 }
 
 /* Resets the size of the viz based on the nodes */
@@ -183,7 +172,7 @@ function click (d)
  // changes static menu only if the sub-reddit has no children
   if (d.children == null)
   {
-    setDisplayNoChildren(d);    
+    displayNoChildren(d);    
     return;
   }
   
@@ -209,18 +198,20 @@ function click (d)
   // Changes the DOM elements for the static menu based on if the node is Reddit or not.
   if(d.name == "Reddit")
   {
-    setDisplayReddit(d);
+    displayReddit(d);
   }
   else
   {
-    setDisplaySubReddits(d);
+    displaySubReddits(d);
+    var rentList2 = document.getElementById('subredditinfo');
+    rentList2.innerHTML = showParentListClick() + "</br>" + " ↓ " + "</br>" + d.name.bold();
   }
 }
 
 /* Controls the change in the visualiztion when the Move up Tree button is called */
 function moveUpTreeButton()
 {
-  if (curNode==null)
+  if (curNode == null)
   {
     return;
   }
@@ -239,12 +230,20 @@ function moveUpTreeButton()
     {
       curNodeParent = curNodeParent.parent;
     }
-
+      
+    var curNode2 = curNode
+    for (i = 0; i < count; i++)
+    {
+      curNode2 = curNode2.parent;
+    }
     // controls the DOM elements based what reddit is the set to the current node
-    backButtonSubReddits();
-
-  // sets count for the amount of times tree has moved up.
-  count ++;
+    displaySubReddits(curNode2);
+  
+     var rentList2 = document.getElementById('subredditinfo');
+    rentList2.innerHTML = showParentListBackButton();
+    
+    // sets count for the amount of times tree has moved up.
+    count++;
   }
 }
 
@@ -390,7 +389,7 @@ function mouseon(d)
         finalChilds = finalChilds + "{" + child.name + "}  ";
         }
       });
-  
+
       return finalChilds;
     }    
   }
@@ -440,30 +439,25 @@ function reset()
   count == 0;
 }
 
+// hides the given DOM element
 function hide(id)
 {
   document.getElementById(id).style.display = "none";
 }
 
+// shows the given DOM element
 function show(id)
 {
   document.getElementById(id).style.display = "block";  
 }
 
-function setDisplayNoChildren(d)
+// displays the subscriber count, reddit links and reddit name text on the DOM elements
+function displayText(d)
 {
-    var subsInfo =  "Subscribers: ";
-    subsInfo = subsInfo.bold();
-  
     var link = "</br> <a href = http://www.reddit.com/r/" + d.name + "> Click here </a>" + "to view the actual sub-reddit page"; 
 
-    hide("redditinfo");
-    show("redditname");
-    show("subscribers");
-    show("redditlink");
-
     var subs = document.getElementById('subscribers');
-    subs.innerHTML = subsInfo + d.size;
+    subs.innerHTML = "<b> Subscribers: </b>" + d.size;
 
     var name = document.getElementById('redditname');
     name.innerHTML = d.name;
@@ -471,7 +465,20 @@ function setDisplayNoChildren(d)
     var redLink = document.getElementById('redditlink');
     redLink.innerHTML = link;
 }
-function setDisplayReddit(d)
+
+// controls the display when clicked on a node with no children
+function displayNoChildren(d)
+{ 
+    hide("redditinfo");
+    show("redditname");
+    show("subscribers");
+    show("redditlink");
+    
+    displayText(d);
+}
+
+// controls the display when clicked on Reddit
+function displayReddit(d)
 {  
     show("redditinfo");
     hide("subredditinfo");
@@ -480,12 +487,9 @@ function setDisplayReddit(d)
     hide("staticmenu2");
 }
 
-function setDisplaySubReddits(d)
+// controls the display when clicked on a subreddit with children that is not Reddit
+function displaySubReddits(d)
 {
-    var subsInfo =  "Subscribers: ";
-    subsInfo = subsInfo.bold();
-  
-    var link = "</br> <a href = http://www.reddit.com/r/" + d.name + "> Click here </a>" + "to view the actual sub-reddit page"; 
 
     hide("redditinfo");
     show("subredditinfo");
@@ -493,74 +497,7 @@ function setDisplaySubReddits(d)
     show("subscribers");
     show("redditlink");
     
-    showParentListClick();
-    var rentList2 = document.getElementById('subredditinfo');
-    rentList2.innerHTML = showParentListClick() + "</br>" + " ↓ " + "</br>" + d.name.bold();
-    
-    var subs = document.getElementById('subscribers');
-    subs.innerHTML = subsInfo + d.size;
-    
-    var name = document.getElementById('redditname');
-    name.innerHTML = d.name;
-    
-    var redLink = document.getElementById('redditlink');
-    redLink.innerHTML = link;
-}
-
-function backButtonSubReddits()
-{
-    hide("redditinfo");
-    show("subredditinfo");
-    show("redditname");
-    show("subscribers");
-    show("redditlink");
-
-    var subs = document.getElementById('subscribers');
-    subs.innerHTML = showSubs();
-    
-    var rentList2 = document.getElementById('subredditinfo');
-    rentList2.innerHTML = showParentListBackButton();
-    
-    var name = document.getElementById('redditname');
-    name.innerHTML = showName();
-    
-    var redLink = document.getElementById('redditlink');
-    redLink.innerHTML = showLink();
-}
-
-function showLink()
-{
-    var curNode2 = curNode;  
-    for (i = 0; i < count; i++)
-    {
-      curNode2 = curNode2.parent;
-    }
-  var link3 = "</br>" + "<a href = http://www.reddit.com/r/" + curNode2.parent.name + "> Click here </a>" + "to view the actual sub-reddit page";
-  return link3;
-}
-
-function showName()
-{
-  var curNode2 = curNode;  
-    for (i = 0; i < count; i++)
-    {
-      curNode2 = curNode2.parent;
-    }
-   return curNode2.parent.name;
-}
-
-function showSubs()
-{
-  var curNode2 = curNode;
-  var subsInfo2 = "";
-  
-    for (i = 0; i < count; i++)
-    {
-      curNode2 = curNode2.parent;
-    }
-    subsInfo2 = "Subscribers: "
-    subsInfo2 = subsInfo2.bold();
-    return subsInfo2 + curNode2.parent.size;
+    displayText(d);
 }
 
 /* Code that controls the autocomplete function*/
@@ -577,8 +514,8 @@ function fillAutoCompleteArray()
     return nodes2;
 }
 
-function findAutoCompleteValue(li) {
-  
+function findAutoCompleteValue(li)
+{
   if( li == null ) return;
   if( !!li.extra ) var sValue = li.extra[0];
   else var sValue = li.selectValue;
@@ -597,46 +534,32 @@ function findAutoCompleteValue(li) {
     });
 }
 
-function selectItem(li) {
-
-	findAutoCompleteValue(li);
-
+function search2()
+{
+  var oSuggest = $("#search")[0].autocompleter;
+  oSuggest.findAutoCompleteValue();
+  return false;
 }
 
-function formatItem(row) {
+$(document).ready(function()
+{
+  $("#search").autocompleteArray(
 
-	return row[0] + " (id: " + row[1] + ")";
-
-}
-
-function lookupLocal(){
-
-	var oSuggest = $("#search")[0].autocompleter;
-	oSuggest.findAutoCompleteValue();
-	return false;
-}
-
-
-$(document).ready(function() {
-
-	$("#search").autocompleteArray(
-
-		fillAutoCompleteArray(),
-		{
-			delay:10,
-
-			minChars:1,
-
-			matchSubset:1,
-
-			onItemSelect:findAutoCompleteValue,
-
-			onFindValue: findAutoCompleteValue,
-
-			autoFill:true,
-
-			maxItemsToShow:10
-
-		}
-	);
+    fillAutoCompleteArray(),
+    {
+      delay:10,
+  
+      minChars:1,
+  
+      matchSubset:1,
+  
+      onItemSelect:findAutoCompleteValue,
+  
+      onFindValue: findAutoCompleteValue,
+  
+      autoFill:true,
+  
+      maxItemsToShow:10
+    }
+  );
 });
