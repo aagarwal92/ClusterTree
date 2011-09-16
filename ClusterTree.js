@@ -301,14 +301,15 @@ function showParentListClick() {
         curNode2 = curNode2.parent;
     }
 
-    for (x = 0; x < 20; x++) {
+    x = 0;
+    while(true) {
         if (x == 0) {
             // if there is only one parent, it will build the list with that parent and return it.
             rentList = "<a onclick='moveUpWithinParentList(\"" + curNode2.parent.name + "\")'>" + curNode2.parent.name + "</a>";
             if (curNode2.parent != undefined) {
                 curNode2 = curNode2.parent;
-                if (curNode2.name == "Reddit") {
-                    return rentList;
+                if (curNode2.name == "Reddit") { 
+                   return rentList;
                 }
             }
         } else {
@@ -322,7 +323,9 @@ function showParentListClick() {
                 }
             }
         }
+    x++;
     }
+    
     return rentList;
 }
 
@@ -379,7 +382,6 @@ function mouseoff(d) {
 
 function reset() {
     window.location.reload();
-    count == 0;
 }
 
 // hides the given DOM element
@@ -473,7 +475,7 @@ function findAutoCompleteValue(li) {
     });
 }
 
-function search2() {
+function autoSearch() {
     var oSuggest = $("#search")[0].autocompleter;
     oSuggest.findAutoCompleteValue();
     return false;

@@ -1,0 +1,115 @@
+body {background-color: #F7F4EE;}
+
+  /* node size css */
+  circle.node {
+  cursor: pointer;
+  fill: #fff;
+  stroke: #4682B4;
+  stroke-width: 1.5;
+  }
+
+  path.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+  }
+
+  /* tooltip css */
+
+  #tt {
+  position:absolute;
+  display:block;
+  background:url(images/tt_left.gif) top left no-repeat;
+  }
+
+  #tttop {
+  display:block;
+  height:5px;
+  margin-left:5px;
+  background:url(images/tt_top.gif) top right no-repeat;
+  overflow:hidden;
+  }
+
+  #ttcont {
+  display:block;
+  padding:2px 12px 3px 7px;
+  margin-left:5px;
+  background:#666;
+  border-radius: 10px;  
+  color:#fff;
+  }
+
+  #ttbot {
+  display:block;
+  height:5px;
+  margin-left:5px;
+  background:url(images/tt_bottom.gif) top right no-repeat;
+  overflow:hidden;
+  }
+
+  /* static menu css */
+  .wireframemenu{
+  border: 1px solid #C0C0C0;
+  border-radius: 10px;    
+  background-color: white;
+  width: 170px;
+  position: absolute;
+  }
+
+  * html .wireframemenu{ /*IE only rule. Original menu width minus all left/right paddings */
+  width: 164px;
+  }
+
+  .wireframemenu ul{
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  }
+
+  .wireframemenu a{
+  font: bold 13px Verdana;
+  padding: 4px 3px;
+  width: 100%; /*Define width for IE6's sake*/
+  color: #595959;
+  text-decoration: none;
+  }
+
+  .wireframemenu a:visited{
+  color: #595959;
+  }
+
+  html>body .wireframemenu a{ /*Non IE rule*/
+  width: auto;
+  }
+
+  .wireframemenu a:hover{
+  background-color: #F7F4EE;
+  color: #000000;
+  cursor: pointer;
+  }
+
+  .clear { /* generic container (i.e. div) for floating buttons */
+    overflow: hidden;
+    width: 100%;
+  }
+
+  #subredditinfo a:first
+  {
+  background-color: #ffff00; 
+  }
+
+  #staticmenu
+  {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 5px;
+  right: 300px; top: 20px; width: 300px;
+  }
+
+  #staticmenu2
+  {
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-bottom: 5px;
+  right: 115px; top: 20px
+  }
